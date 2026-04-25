@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Collection {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  icon        String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       Item[]
+  tags        Tag[]
+}
+
+model Item {
+  id             String     @id @default(cuid())
+  title          String
+  subtitle       String?
+  description    String?
+  notes          String?
+  collectionId   String
+  collection     Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  status         ItemStatus @default(OWNED)
+  condition      Condition? @default(GOOD)
+  externalId     String?
+  externalSource String?
+  externalUrl    String?
+  metadata       String?
+  acquiredAt     DateTime?
+  acquiredFrom   String?
+  pricePaid      Float?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  photos         Photo[]
+  tags           ItemTag[]
+}
+
+model Photo {
+  id           String   @id @default(cuid())
+  itemId       String
+  item         Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  filename     String
+  originalName String?
+  width        Int?
+  height       Int?
+  size         Int?
+  isPrimary    Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model Tag {
+  id           String      @id @default(cuid())
+  name         String
+  slug         String
+  color        String?
+  collectionId String?
+  collection   Collection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  createdAt    DateTime    @default(now())
+  items        ItemTag[]
+
+  @@unique([slug, collectionId])
+}
+
+model ItemTag {
+  itemId String
+  tagId  String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([itemId, tagId])
+}
+
+enum ItemStatus {
+  OWNED
+  WANTED
+  WISHLIST
+  FOR_SALE
+  SOLD
+  LOANED_OUT
+  MISSING
+}
+
+enum Condition {
+  MINT
+  NEAR_MINT
+  VERY_GOOD
+  GOOD
+  FAIR
+  POOR
+  DAMAGED
+}

@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - archive-db:/data/db
+      - archive-uploads:/data/uploads
+    environment:
+      DATABASE_URL: "file:/data/db/archive.db"
+      UPLOAD_DIR: "/data/uploads"
+      TWITCH_CLIENT_ID: "${TWITCH_CLIENT_ID:-}"
+      TWITCH_CLIENT_SECRET: "${TWITCH_CLIENT_SECRET:-}"
+      GOOGLE_BOOKS_API_KEY: "${GOOGLE_BOOKS_API_KEY:-}"
+      COMICVINE_API_KEY: "${COMICVINE_API_KEY:-}"
+      TMDB_API_KEY: "${TMDB_API_KEY:-}"
+
+volumes:
+  archive-db:
+  archive-uploads:

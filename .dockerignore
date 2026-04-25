@@ -1,0 +1,9 @@
+.git
+.gitignore
+.next
+node_modules
+dev.db
+uploads
+*.md
+.env
+.env.local
